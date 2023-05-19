@@ -21,37 +21,58 @@ const db = getFirestore(app);
 
 
 //Fonction pour recuperer ma collection
+const getData = async () => {
+  const collectionRef = collection(db, "Catalogue");
+  const querySnapshot = await getDocs(collectionRef);
+  const vetement = querySnapshot.docs.map((doc) => ({...doc.data(), id: doc.id}));
 
-  const displayVetement = (vetement) => {
-    const container = document.querySelector('#vetement-container'); 
+ 
+  displayVetement(vetement);
+};
+
+
+getData();
+
+// Fonction pour fficher ma collection sur le site avec HTML
+const displayVetement = (vetement) => {
+  const container = document.querySelector('#vetement-container');
+
+  vetement.forEach((obj) => {
+    const objElement = document.createElement('div');
+    objElement.classList.add('vetement-index');
+    objElement.innerHTML = `
+      <div class="bg-red-200  border-2 rounded shadow p-4 m-2 cursor-pointer transition transform hover:scale-105">
+        <img class="w-40 h-40 object-cover vetement-image" src="${obj.img}">
+        <div class="text-indigo-500 text-xs font-medium">${obj.nom}</div>
+        <div class="text-gray-900 text-lg font-medium">${obj.prix}</div>
+        <div class="text-base">${obj.description}</div>
+      </div>
+    `;
+
   
-
-    vetement.forEach((obj) => {
-      const objElement = document.createElement('div');
-      objElement.classList.add('vetement-index'); 
-      objElement.innerHTML = `
-      <div class="bg-red-100  border-2 rounded shadow p-4 m-2 cursor-pointer transition transform hover:scale-105">
-      <img class="w-40 h-40 object-cover vetement-image" src="${obj.img}">
-      <div class="text-indigo-500 text-xs font-medium">${obj.nom}</div>
-      <div class="text-gray-900 text-lg font-medium">${obj.prix}</div>
-      <div class="text-base">${obj.description}</div>
-    </div>
-
-    `
-  
-
-      container.appendChild(objElement);
+    objElement.addEventListener('click', () => {
+      displayVetementDetails(obj); 
     });
-  };
+
+    container.appendChild(objElement);
+  });
+};
+const displayVetementDetails = (vetement) => {
+  const container = document.querySelector('#vetement-container');
+  container.innerHTML = '';
+
+  const objElement = document.createElement('div');
+  objElement.classList.add('vetement-details');
+  objElement.innerHTML = `
+  <div class="bg-red-200  border-2 rounded shadow p-4 m-2">
+    <img class="w-40 h-40 object-cover vetement-image" src="${vetement.img}">
+    <div class="text-indigo-500 text-xs font-medium">${vetement.nom}</div>
+    <div class="text-gray-900 text-lg font-medium">${vetement.prix}</div>
+    <div class="text-base">${vetement.description}</div>
+  </div>
+`;
+
+  container.appendChild(objElement);
+};
   
-  const getData = async () => {
-    const collectionRef = collection(db, "Catalogue");
-    const querySnapshot = await getDocs(collectionRef);
-    const vetement = querySnapshot.docs.map((doc) => ({...doc.data(), id: doc.id}));
-  
-   
-    displayVetement(vetement);
-  };
-  
-  
-  getData();
+ 

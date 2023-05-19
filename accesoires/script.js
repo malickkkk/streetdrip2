@@ -19,36 +19,61 @@ const db = getFirestore(app);
   
   
 //Fonction pour recuperer ma collection
-  const displayAccesoire = (accesoire) => {
-    const container = document.querySelector('#vetement-container'); 
   
-    // Parcourez les données de mon catalogue
-    accesoire.forEach((obj) => {
-      const objElement = document.createElement('div');
-      objElement.classList.add('accesoire-index'); 
-      objElement.innerHTML = `
-      <div class="bg-red-100  border-2 rounded shadow p-4 m-2 cursor-pointer transition transform hover:scale-105">
-      <img class="w-40 h-40 object-cover vetement-image" src="${obj.img}">
-      <div class="text-indigo-500 text-xs font-medium">${obj.nom}</div>
-      <div class="text-gray-900 text-lg font-medium">${obj.prix}</div>
-      <div class="text-base">${obj.description}</div>
-    </div>
+const getData = async () => {
+  const collectionRef = collection(db, "Accesoire");
+  const querySnapshot = await getDocs(collectionRef);
+  const accesoire = querySnapshot.docs.map((doc) => ({...doc.data(), id: doc.id}));
 
-    `
+
+  displayAccesoire(accesoire);
+};
+
+getData(); 
+
   
-      container.appendChild(objElement);
+  // Fonction pour afficher ma collection sur le site avec HTML
+const displayAccesoire = (accesoire) => {
+  const container = document.querySelector('#vetement-container');
+
+  accesoire.forEach((obj) => {
+    const objElement = document.createElement('div');
+    objElement.classList.add('accesoire-index');
+    objElement.innerHTML = `
+      <div class="bg-red-200  border-2 rounded shadow p-4 m-2 cursor-pointer transition transform hover:scale-105">
+        <img class="w-40 h-40 object-cover vetement-image" src="${obj.img}">
+        <div class="text-indigo-500 text-xs font-medium">${obj.nom}</div>
+        <div class="text-gray-900 text-lg font-medium">${obj.prix}</div>
+        <div class="text-base">${obj.description}</div>
+      </div>
+    `;
+
+  
+    objElement.addEventListener('click', () => {
+      displayAccesoireDetails(obj); 
     });
-  };
-  
-  const getData = async () => {
-    const collectionRef = collection(db, "Accesoire");
-    const querySnapshot = await getDocs(collectionRef);
-    const accesoire = querySnapshot.docs.map((doc) => ({...doc.data(), id: doc.id}));
+
+    container.appendChild(objElement);
+  });
+};
+const displayAccesoireDetails = (accesoire) => {
+  const container = document.querySelector('#vetement-container');
+  container.innerHTML = '';
+
+  const objElement = document.createElement('div');
+  objElement.classList.add('accesoire-details');
+  objElement.innerHTML = `
+    <div class="bg-red-100  border-2 rounded shadow p-4 m-2">
+      <img class="w-40 h-40 object-cover vetement-image" src="${accesoire.img}">
+      <div class="text-indigo-500 text-xs font-medium">${accesoire.nom}</div>
+      <div class="text-gray-900 text-lg font-medium">${accesoire.prix}</div>
+      <div class="text-base">${accesoire.description}</div>
+    </div>
+  `;
+
+  container.appendChild(objElement);
+};
   
  
-    displayAccesoire(accesoire);
-  };
-  
-  getData();
 
   
